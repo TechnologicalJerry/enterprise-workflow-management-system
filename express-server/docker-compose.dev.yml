@@ -1,0 +1,159 @@
+# ============================================
+# Enterprise Workflow Management System
+# Docker Compose - Development Overrides
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# ============================================
+
+version: '3.9'
+
+services:
+  # Override for development - mount source code
+  api-gateway:
+    build:
+      target: development
+    volumes:
+      - ./api-gateway/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  auth-service:
+    build:
+      target: development
+    volumes:
+      - ./services/auth-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  user-service:
+    build:
+      target: development
+    volumes:
+      - ./services/user-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  permission-service:
+    build:
+      target: development
+    volumes:
+      - ./services/permission-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  workflow-definition-service:
+    build:
+      target: development
+    volumes:
+      - ./services/workflow-definition-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  workflow-instance-service:
+    build:
+      target: development
+    volumes:
+      - ./services/workflow-instance-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  task-service:
+    build:
+      target: development
+    volumes:
+      - ./services/task-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  approval-service:
+    build:
+      target: development
+    volumes:
+      - ./services/approval-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  document-service:
+    build:
+      target: development
+    volumes:
+      - ./services/document-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  audit-service:
+    build:
+      target: development
+    volumes:
+      - ./services/audit-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  notification-service:
+    build:
+      target: development
+    volumes:
+      - ./services/notification-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  reporting-service:
+    build:
+      target: development
+    volumes:
+      - ./services/reporting-service/src:/app/src
+      - ./shared/src:/app/node_modules/@workflow/shared/src
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+  # MinIO for local S3-compatible storage
+  minio:
+    image: minio/minio:latest
+    container_name: workflow-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - workflow-network
+
+  # Mailhog for email testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: workflow-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - workflow-network
+
+volumes:
+  minio_data:
+    driver: local
