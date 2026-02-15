@@ -1,0 +1,86 @@
+{
+  "name": "@workflow/root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enterprise Workflow Management System - Microservices Architecture",
+  "keywords": [
+    "enterprise",
+    "microservices",
+    "workflow-management",
+    "express",
+    "typescript",
+    "nodejs",
+    "rest-api",
+    "backend",
+    "jwt-auth",
+    "postgresql",
+    "redis",
+    "kafka",
+    "docker"
+  ],
+  "author": "technojerry",
+  "license": "ISC",
+  "workspaces": [
+    "shared",
+    "api-gateway",
+    "services/*"
+  ],
+  "homepage": "https://github.com/TechnologicalJerry/enterprise-workflow-management-system#readme",
+  "bugs": {
+    "url": "https://github.com/TechnologicalJerry/enterprise-workflow-management-system/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TechnologicalJerry/enterprise-workflow-management-system.git"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently -n gateway,auth,user,permission,workflow-def,workflow-inst,task,approval,document,audit,notification,reporting -c blue,green,yellow,magenta,cyan,red,white,gray,orange,purple,pink,lime \"npm run dev -w @workflow/api-gateway\" \"npm run dev -w @workflow/auth-service\" \"npm run dev -w @workflow/user-service\" \"npm run dev -w @workflow/permission-service\" \"npm run dev -w @workflow/workflow-definition-service\" \"npm run dev -w @workflow/workflow-instance-service\" \"npm run dev -w @workflow/task-service\" \"npm run dev -w @workflow/approval-service\" \"npm run dev -w @workflow/document-service\" \"npm run dev -w @workflow/audit-service\" \"npm run dev -w @workflow/notification-service\" \"npm run dev -w @workflow/reporting-service\"",
+    "dev:gateway": "npm run dev -w @workflow/api-gateway",
+    "dev:auth": "npm run dev -w @workflow/auth-service",
+    "dev:user": "npm run dev -w @workflow/user-service",
+    "dev:permission": "npm run dev -w @workflow/permission-service",
+    "dev:workflow-def": "npm run dev -w @workflow/workflow-definition-service",
+    "dev:workflow-inst": "npm run dev -w @workflow/workflow-instance-service",
+    "dev:task": "npm run dev -w @workflow/task-service",
+    "dev:approval": "npm run dev -w @workflow/approval-service",
+    "dev:document": "npm run dev -w @workflow/document-service",
+    "dev:audit": "npm run dev -w @workflow/audit-service",
+    "dev:notification": "npm run dev -w @workflow/notification-service",
+    "dev:reporting": "npm run dev -w @workflow/reporting-service",
+    "build": "npm run build --workspaces --if-present",
+    "build:shared": "npm run build -w @workflow/shared",
+    "start": "npm run start --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:unit": "npm run test:unit --workspaces --if-present",
+    "test:integration": "npm run test:integration --workspaces --if-present",
+    "test:e2e": "npm run test:e2e --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "format": "npm run format --workspaces --if-present",
+    "format:check": "npm run format:check --workspaces --if-present",
+    "migrate": "npm run migrate --workspaces --if-present",
+    "migrate:dev": "npm run migrate:dev --workspaces --if-present",
+    "db:seed": "npm run db:seed --workspaces --if-present",
+    "prisma:generate": "npm run prisma:generate --workspaces --if-present",
+    "clean": "rimraf node_modules shared/node_modules shared/dist services/*/node_modules services/*/dist api-gateway/node_modules api-gateway/dist",
+    "prepare": "npm run build:shared"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.1.1",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.2"
+  }
+}
