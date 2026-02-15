@@ -1,0 +1,55 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+model ApprovalRequest {
+  id                  String   @id @default(uuid())
+  title               String
+  description         String?
+  type                String
+  status              String   @default("pending") // pending, approved, rejected, cancelled
+  workflowInstanceId  String?  @map("workflow_instance_id")
+  entityType          String?  @map("entity_type")
+  entityId            String?  @map("entity_id")
+  dueDate             DateTime? @map("due_date")
+  createdBy           String   @map("created_by")
+  metadata            Json?
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  approvers   ApprovalApprover[]
+  decisions   ApprovalDecision[]
+
+  @@index([status])
+  @@index([createdBy])
+  @@map("approval_requests")
+}
+
+model ApprovalApprover {
+  id          String   @id @default(uuid())
+  requestId   String   @map("request_id")
+  userId      String   @map("user_id")
+  order       Int      @default(0)
+  required    Boolean  @default(true)
+  status      String   @default("pending") // pending, approved, rejected
+
+  request     ApprovalRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, userId])
+  @@index([requestId])
+  @@index([userId])
+  @@map("approval_approvers")
+}
+
+model ApprovalDecision {
+  id          String   @id @default(uuid())
+  requestId   String   @map("request_id")
+  userId      String   @map("user_id")
+  decision    String   // approve, reject, request_changes
+  comment     String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  request     ApprovalRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@map("approval_decisions")
+}
