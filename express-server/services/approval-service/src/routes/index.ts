@@ -1,0 +1,14 @@
+import { Router } from 'express';
+import * as ctrl from '../controllers/approval.controller.js';
+import { correlationIdMiddleware, errorMiddleware } from '../middlewares/index.js';
+const router = Router();
+router.use(correlationIdMiddleware);
+router.get('/', ctrl.list);
+router.get('/pending', ctrl.getPending);
+router.get('/my-requests', ctrl.getMyRequests);
+router.post('/', ctrl.create);
+router.get('/:id', ctrl.getById);
+router.post('/:id/decide', ctrl.decide);
+router.post('/:id/cancel', ctrl.cancel);
+router.get('/:id/history', ctrl.getHistory);
+export const routes = router;
