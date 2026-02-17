@@ -1,6 +1,17 @@
 # How to Run the Express Server (Microservices)
 
-This guide explains **what must be running before** the Express server and **how to run** the full stack **locally on your system (no Docker)**. Docker is covered in section 3 for later.
+This guide follows the exact order: **setup DB first**, then run **without Docker**, then switch to **Docker** after local success.
+
+---
+
+## 0. Fast Path (recommended order)
+
+1. Setup PostgreSQL + create all service databases (section 2.1)
+2. Start Redis (section 2.2)
+3. Configure env + install + migrate + seed (sections 4–6)
+4. Run all services locally (section 7)
+5. Verify health endpoints (section 8)
+6. Move to Docker flow (section 3)
 
 ---
 
@@ -38,6 +49,17 @@ These must be running **before** you start the Express API Gateway and microserv
      ```
 
 3. **Create the 11 databases** (once)
+    - Preferred on Windows (from `express-server`):
+       ```powershell
+       .\infrastructure\scripts\setup-db-local.ps1 -DbUser postgres -DbPassword postgres -NameSet local
+       ```
+    - This creates: `workflow_auth`, `workflow_user`, `workflow_permission`, `workflow_workflow_def`, `workflow_workflow_inst`, `workflow_task`, `workflow_approval`, `workflow_document`, `workflow_audit`, `workflow_notification`, `workflow_reporting`.
+      - If script execution is blocked, run this once in PowerShell as Administrator:
+         ```powershell
+         Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+         ```
+
+4. **Alternative manual SQL**
    - Open **pgAdmin** or **psql** and run:
      ```sql
      CREATE DATABASE workflow_auth;
@@ -56,8 +78,6 @@ These must be running **before** you start the Express API Gateway and microserv
      ```powershell
      psql -U postgres -c "CREATE DATABASE workflow_auth; CREATE DATABASE workflow_user; CREATE DATABASE workflow_permission; CREATE DATABASE workflow_workflow_def; CREATE DATABASE workflow_workflow_inst; CREATE DATABASE workflow_task; CREATE DATABASE workflow_approval; CREATE DATABASE workflow_document; CREATE DATABASE workflow_audit; CREATE DATABASE workflow_notification; CREATE DATABASE workflow_reporting;"
      ```
-
-You should see `workflow-postgres` and `workflow-redis` with state “Up” (and “healthy” for postgres).
 
 ### 2.2 Install and run Redis (Windows)
 
@@ -83,15 +103,32 @@ You should see `workflow-postgres` and `workflow-redis` with state “Up” (and
 
 ---
 
-## 3. (Later) Run infrastructure with Docker
+## 3. After local success: run with Docker
 
-When you switch to Docker:
+When local non-Docker flow is working, switch to Docker in this order:
 
-- Start only Postgres and Redis:
-  ```bash
-  docker-compose up -d postgres redis
-  ```
-- Docker's init creates DBs named `auth_db`, `user_db`, … so either use those names in each service's `DATABASE_URL` or create `workflow_*` DBs manually. See section 4 (Environment) for DB names.
+1. Start infrastructure only:
+   ```bash
+   docker-compose up -d postgres redis
+   ```
+2. Wait for health:
+   ```bash
+   docker-compose ps
+   ```
+3. Note DB naming:
+   - Docker init creates `auth_db`, `user_db`, `permission_db`, `workflow_def_db`, `workflow_inst_db`, `task_db`, `approval_db`, `document_db`, `audit_db`, `notification_db`, `reporting_db`.
+   - Local service `.env.example` files use `workflow_*` names.
+4. Choose one:
+   - Keep Docker DB names and update each service `DATABASE_URL`, or
+   - Create `workflow_*` in Docker Postgres too (you can run `setup-db-local.ps1 -NameSet local` against Docker Postgres credentials).
+   - If you want to create Docker-style names manually, run:
+     ```powershell
+     .\infrastructure\scripts\setup-db-local.ps1 -DbUser workflow_admin -DbPassword <your_password> -NameSet docker
+     ```
+5. Then start full stack with Docker:
+   ```bash
+   docker-compose up -d
+   ```
 
 ---
 
@@ -108,6 +145,12 @@ Copy the root example and set at least:
 ```bash
 cd express-server
 cp .env.example .env
+```
+
+On PowerShell (Windows), if `cp` alias is unavailable, use:
+
+```powershell
+Copy-Item .env.example .env
 ```
 
 Edit `.env` and set:
@@ -167,7 +210,7 @@ If `build:shared` fails due to TypeScript in `shared`, you can still run service
 
 ## 6. Run Migrations and Seeds
 
-Each service that uses Prisma needs its database created and migrated. Use the same `DATABASE_URL` (and DB name) you configured in step 3.
+Each service that uses Prisma needs its database created and migrated. Use the same `DATABASE_URL` (and DB name) you configured in section 4.
 
 Run migrations (and seed where applicable) for each service. Examples (adjust workspace name if different):
 
