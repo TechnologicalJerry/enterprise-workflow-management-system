@@ -4,7 +4,7 @@
 
 **PostgreSQL:** One instance (default port **5432**), **11 separate databases** (one per service). Each service has its own DB; no shared DB.
 
-**Database names:**
+**Database names (local, no Docker):**
 
 | Service              | Database name              |
 |----------------------|----------------------------|
@@ -21,6 +21,8 @@
 | Reporting            | `workflow_reporting`      |
 
 **Connection:** Each service uses `DATABASE_URL` in its `.env` (e.g. `postgresql://USER:PASSWORD@localhost:5432/workflow_auth?schema=public`). Migrations and seeds are per-service (Prisma in each service folder).
+
+**Database names (Docker init default):** `auth_db`, `user_db`, `permission_db`, `workflow_def_db`, `workflow_inst_db`, `task_db`, `approval_db`, `document_db`, `audit_db`, `notification_db`, `reporting_db`.
 
 **Redis:** Port **6379** – used by API Gateway and Auth (sessions, rate limit, token blacklist). Not a “DB name”; it’s a separate cache/session store.
 
