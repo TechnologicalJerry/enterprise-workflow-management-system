@@ -1,0 +1,198 @@
+// ============================================
+// Auth Service - Prisma Schema
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// User Credentials (Local Authentication)
+// ============================================
+model UserCredential {
+  id            String   @id @default(uuid())
+  userId        String   @unique @map("user_id")
+  email         String   @unique
+  passwordHash  String   @map("password_hash")
+  
+  // Security
+  failedAttempts    Int      @default(0) @map("failed_attempts")
+  lockedUntil       DateTime? @map("locked_until")
+  lastLoginAt       DateTime? @map("last_login_at")
+  lastLoginIp       String?   @map("last_login_ip")
+  lastPasswordChange DateTime @default(now()) @map("last_password_change")
+  
+  // Email verification
+  emailVerified     Boolean  @default(false) @map("email_verified")
+  emailVerifiedAt   DateTime? @map("email_verified_at")
+  
+  // MFA
+  mfaEnabled        Boolean  @default(false) @map("mfa_enabled")
+  mfaSecret         String?  @map("mfa_secret")
+  mfaBackupCodes    String[] @map("mfa_backup_codes")
+  
+  // Timestamps
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  refreshTokens       RefreshToken[]
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+
+  @@index([email])
+  @@index([userId])
+  @@map("user_credentials")
+}
+
+// ============================================
+// Refresh Tokens
+// ============================================
+model RefreshToken {
+  id            String   @id @default(uuid())
+  token         String   @unique
+  credentialId  String   @map("credential_id")
+  
+  // Token info
+  deviceInfo    String?  @map("device_info")
+  ipAddress     String?  @map("ip_address")
+  userAgent     String?  @map("user_agent")
+  
+  // Validity
+  isRevoked     Boolean  @default(false) @map("is_revoked")
+  revokedAt     DateTime? @map("revoked_at")
+  revokedReason String?  @map("revoked_reason")
+  expiresAt     DateTime @map("expires_at")
+  
+  // Token rotation (for tracking token family)
+  familyId      String   @map("family_id")
+  generation    Int      @default(0)
+  
+  // Timestamps
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  credential    UserCredential @relation(fields: [credentialId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([credentialId])
+  @@index([familyId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+// ============================================
+// Sessions
+// ============================================
+model Session {
+  id            String   @id @default(uuid())
+  credentialId  String   @map("credential_id")
+  
+  // Session info
+  deviceInfo    String?  @map("device_info")
+  ipAddress     String?  @map("ip_address")
+  userAgent     String?  @map("user_agent")
+  location      String?
+  
+  // Validity
+  isActive      Boolean  @default(true) @map("is_active")
+  lastActivityAt DateTime @default(now()) @map("last_activity_at")
+  expiresAt     DateTime @map("expires_at")
+  
+  // Timestamps
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  credential    UserCredential @relation(fields: [credentialId], references: [id], onDelete: Cascade)
+
+  @@index([credentialId])
+  @@index([expiresAt])
+  @@index([isActive])
+  @@map("sessions")
+}
+
+// ============================================
+// Password Reset Tokens
+// ============================================
+model PasswordResetToken {
+  id            String   @id @default(uuid())
+  token         String   @unique
+  credentialId  String   @map("credential_id")
+  
+  // Validity
+  isUsed        Boolean  @default(false) @map("is_used")
+  usedAt        DateTime? @map("used_at")
+  expiresAt     DateTime @map("expires_at")
+  
+  // Timestamps
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  credential    UserCredential @relation(fields: [credentialId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([credentialId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+// ============================================
+// Email Verification Tokens
+// ============================================
+model EmailVerificationToken {
+  id            String   @id @default(uuid())
+  token         String   @unique
+  credentialId  String   @map("credential_id")
+  
+  // Validity
+  isUsed        Boolean  @default(false) @map("is_used")
+  usedAt        DateTime? @map("used_at")
+  expiresAt     DateTime @map("expires_at")
+  
+  // Timestamps
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  credential    UserCredential @relation(fields: [credentialId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([credentialId])
+  @@index([expiresAt])
+  @@map("email_verification_tokens")
+}
+
+// ============================================
+// Audit Log (for security events)
+// ============================================
+model AuthAuditLog {
+  id            String   @id @default(uuid())
+  userId        String?  @map("user_id")
+  email         String?
+  
+  // Event info
+  eventType     String   @map("event_type")
+  eventStatus   String   @map("event_status") // success, failure
+  
+  // Request info
+  ipAddress     String?  @map("ip_address")
+  userAgent     String?  @map("user_agent")
+  
+  // Additional data
+  metadata      Json?
+  errorMessage  String?  @map("error_message")
+  
+  // Timestamps
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([email])
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("auth_audit_logs")
+}
