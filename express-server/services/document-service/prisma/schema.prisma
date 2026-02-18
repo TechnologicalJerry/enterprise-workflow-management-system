@@ -1,0 +1,35 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+model Document {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  storageKey  String   @map("storage_key")  // path in storage (e.g. S3 key)
+  mimeType    String   @map("mime_type")
+  size        Int
+  folderId    String?  @map("folder_id")
+  entityType  String?  @map("entity_type")
+  entityId    String?  @map("entity_id")
+  uploadedBy  String?  @map("uploaded_by")
+  version     Int      @default(1)
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([folderId])
+  @@index([entityType, entityId])
+  @@map("documents")
+}
+
+model DocumentFolder {
+  id          String   @id @default(uuid())
+  name        String
+  parentId    String?  @map("parent_id")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([parentId])
+  @@map("document_folders")
+}
