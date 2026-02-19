@@ -1,0 +1,17 @@
+import { Router } from 'express';
+import * as ctrl from '../controllers/reporting.controller.js';
+import { correlationIdMiddleware, errorMiddleware } from '../middlewares/index.js';
+const router = Router();
+router.use(correlationIdMiddleware);
+router.get('/dashboard', ctrl.getDashboard);
+router.get('/dashboard/widgets', ctrl.getDashboardWidgets);
+router.get('/workflows/analytics', ctrl.getWorkflowAnalytics);
+router.get('/tasks/analytics', ctrl.getTaskAnalytics);
+router.get('/approvals/analytics', ctrl.getApprovalAnalytics);
+router.get('/users/activity', ctrl.getUserActivity);
+router.post('/generate', ctrl.generateReport);
+router.get('/scheduled', ctrl.listScheduled);
+router.get('/:id', ctrl.getReport);
+router.get('/:id/download', ctrl.downloadReport);
+router.delete('/scheduled/:id', ctrl.cancelScheduled);
+export const routes = router;
