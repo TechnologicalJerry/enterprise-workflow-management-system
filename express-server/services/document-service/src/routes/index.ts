@@ -1,0 +1,15 @@
+import { Router } from 'express';
+import * as ctrl from '../controllers/document.controller.js';
+import { correlationIdMiddleware, errorMiddleware } from '../middlewares/index.js';
+const router = Router();
+router.use(correlationIdMiddleware);
+router.get('/', ctrl.list);
+router.post('/', ctrl.upload);
+router.get('/folders', ctrl.listFolders);
+router.post('/folders', ctrl.createFolder);
+router.get('/:id', ctrl.getById);
+router.patch('/:id', ctrl.update);
+router.delete('/:id', ctrl.deleteDoc);
+router.get('/:id/download', ctrl.download);
+router.get('/:id/versions', ctrl.getVersions);
+export const routes = router;
