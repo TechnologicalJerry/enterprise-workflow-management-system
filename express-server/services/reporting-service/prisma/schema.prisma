@@ -1,0 +1,17 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+model ReportJob {
+  id          String   @id @default(uuid())
+  type        String
+  status      String   @default("pending") // pending, running, completed, failed
+  filters     Json?
+  requestedBy String?  @map("requested_by")
+  resultUrl   String?  @map("result_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  completedAt DateTime? @map("completed_at")
+
+  @@index([type])
+  @@index([status])
+  @@map("report_jobs")
+}
