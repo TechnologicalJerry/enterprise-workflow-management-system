@@ -1,0 +1,14 @@
+import { Router } from 'express';
+import * as ctrl from '../controllers/notification.controller.js';
+import { correlationIdMiddleware, errorMiddleware } from '../middlewares/index.js';
+const router = Router();
+router.use(correlationIdMiddleware);
+router.get('/', ctrl.list);
+router.get('/unread-count', ctrl.unreadCount);
+router.get('/preferences', ctrl.getPreferences);
+router.put('/preferences', ctrl.updatePreferences);
+router.post('/read-all', ctrl.markAllRead);
+router.get('/:id', ctrl.getById);
+router.post('/:id/read', ctrl.markRead);
+router.delete('/:id', ctrl.deleteNotification);
+export const routes = router;
