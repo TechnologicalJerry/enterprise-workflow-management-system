@@ -1,0 +1,86 @@
+// ============================================
+// Permission Service - Prisma Schema
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Permission (granular action)
+// ============================================
+model Permission {
+  id          String   @id @default(uuid())
+  name        String   @unique  // e.g. "user:read"
+  description String?
+  resource    String   // e.g. "user", "workflow", "task"
+  action      String   // e.g. "read", "create", "update", "delete"
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  rolePermissions RolePermission[]
+
+  @@index([resource, action])
+  @@map("permissions")
+}
+
+// ============================================
+// Role (group of permissions)
+// ============================================
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique  // e.g. "admin", "user", "viewer"
+  description String?
+  isSystem    Boolean  @default(false) @map("is_system")  // system roles cannot be deleted
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  @@map("roles")
+}
+
+// ============================================
+// Role-Permission (many-to-many)
+// ============================================
+model RolePermission {
+  id           String   @id @default(uuid())
+  roleId       String   @map("role_id")
+  permissionId String   @map("permission_id")
+  
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+// ============================================
+// User-Role (user from user-service, id is userId)
+// ============================================
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")   // references user-service users.id
+  roleId    String   @map("role_id")
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
