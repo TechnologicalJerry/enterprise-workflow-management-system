@@ -1,0 +1,16 @@
+import { Router } from 'express';
+import * as ctrl from '../controllers/task.controller.js';
+import { correlationIdMiddleware, errorMiddleware } from '../middlewares/index.js';
+const router = Router();
+router.use(correlationIdMiddleware);
+router.get('/', ctrl.list);
+router.get('/my', ctrl.getMyTasks);
+router.post('/', ctrl.create);
+router.get('/:id', ctrl.getById);
+router.patch('/:id', ctrl.update);
+router.delete('/:id', ctrl.deleteTask);
+router.patch('/:id/status', ctrl.updateStatus);
+router.post('/:id/assign', ctrl.assign);
+router.get('/:id/comments', ctrl.getComments);
+router.post('/:id/comments', ctrl.addComment);
+export const routes = router;
