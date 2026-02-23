@@ -1,0 +1,35 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+model Task {
+  id                  String    @id @default(uuid())
+  title               String
+  description         String?
+  status              String    @default("pending") // pending, in_progress, completed, cancelled, blocked
+  assigneeId          String?   @map("assignee_id")
+  priority            String    @default("normal")
+  dueDate             DateTime? @map("due_date")
+  workflowInstanceId  String?   @map("workflow_instance_id")
+  parentTaskId        String?   @map("parent_task_id")
+  tags                String[]
+  metadata            Json?
+  createdBy           String?   @map("created_by")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  @@index([assigneeId])
+  @@index([status])
+  @@index([workflowInstanceId])
+  @@map("tasks")
+}
+
+model TaskComment {
+  id        String   @id @default(uuid())
+  taskId    String   @map("task_id")
+  content   String
+  authorId  String   @map("author_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([taskId])
+  @@map("task_comments")
+}
