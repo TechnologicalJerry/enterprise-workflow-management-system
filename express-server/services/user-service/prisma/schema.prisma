@@ -1,0 +1,83 @@
+// ============================================
+// User Service - Prisma Schema
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Department (optional hierarchy)
+// ============================================
+model Department {
+  id          String   @id @default(uuid())
+  name        String
+  code        String   @unique
+  description String?
+  parentId    String?  @map("parent_id")
+  
+  // Timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  parent      Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id])
+  children    Department[] @relation("DepartmentHierarchy")
+  users       User[]
+
+  @@index([parentId])
+  @@index([code])
+  @@map("departments")
+}
+
+// ============================================
+// User (core identity - no credentials here)
+// ============================================
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  firstName     String   @map("first_name")
+  lastName      String   @map("last_name")
+  
+  // Status
+  status        UserStatus @default(ACTIVE)
+  emailVerified Boolean  @default(false) @map("email_verified")
+  
+  // Optional profile fields (can be in separate table for large payloads)
+  phone         String?
+  avatar        String?
+  timezone      String?  @default("UTC")
+  locale        String?  @default("en")
+  
+  // Organization
+  departmentId  String?  @map("department_id")
+  
+  // Flexible metadata (preferences, custom attributes)
+  metadata      Json?    @default("{}")
+  
+  // Timestamps
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+  
+  // Relations
+  department    Department? @relation(fields: [departmentId], references: [id])
+
+  @@index([email])
+  @@index([status])
+  @@index([departmentId])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
