@@ -1,0 +1,20 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+model WorkflowDefinition {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  category    String?
+  version     String   @default("1.0.0")
+  status      String   @default("draft") // draft, active, deprecated
+  steps       Json     // array of step definitions
+  metadata    Json?
+  createdBy   String?  @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([category])
+  @@map("workflow_definitions")
+}
