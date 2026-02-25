@@ -1,0 +1,36 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+model WorkflowInstance {
+  id             String   @id @default(uuid())
+  definitionId   String   @map("definition_id")
+  name           String
+  status         String   @default("pending") // pending, running, completed, failed, cancelled
+  currentStepId  String?  @map("current_step_id")
+  context        Json?    @default("{}")
+  priority       String   @default("normal")
+  dueDate        DateTime? @map("due_date")
+  startedBy      String?  @map("started_by")
+  startedAt      DateTime? @map("started_at")
+  completedAt    DateTime? @map("completed_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([definitionId])
+  @@index([status])
+  @@index([startedBy])
+  @@map("workflow_instances")
+}
+
+model WorkflowHistory {
+  id          String   @id @default(uuid())
+  instanceId  String   @map("instance_id")
+  stepId      String   @map("step_id")
+  action      String
+  payload     Json?
+  performedBy String?  @map("performed_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([instanceId])
+  @@map("workflow_history")
+}
