@@ -1,0 +1,12 @@
+import { Router } from 'express';
+import * as ctrl from '../controllers/workflow-instance.controller.js';
+import { correlationIdMiddleware, errorMiddleware } from '../middlewares/index.js';
+const router = Router();
+router.use(correlationIdMiddleware);
+router.get('/', ctrl.list);
+router.post('/', ctrl.start);
+router.get('/:id', ctrl.getById);
+router.post('/:id/transition', ctrl.transition);
+router.post('/:id/cancel', ctrl.cancel);
+router.get('/:id/history', ctrl.getHistory);
+export const routes = router;
