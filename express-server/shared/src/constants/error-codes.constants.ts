@@ -1,0 +1,126 @@
+// ============================================
+// Application Error Codes
+// ============================================
+
+export const ERROR_CODES = {
+  // General Errors (1xxx)
+  GENERAL: {
+    INTERNAL_ERROR: 'ERR_1000',
+    VALIDATION_ERROR: 'ERR_1001',
+    NOT_FOUND: 'ERR_1002',
+    CONFLICT: 'ERR_1003',
+    BAD_REQUEST: 'ERR_1004',
+    SERVICE_UNAVAILABLE: 'ERR_1005',
+    TIMEOUT: 'ERR_1006',
+    BAD_GATEWAY: 'ERR_1007',
+    INVALID_JSON: 'ERR_1008',
+  },
+
+  // Authentication Errors (2xxx)
+  AUTH: {
+    UNAUTHORIZED: 'ERR_2000',
+    INVALID_CREDENTIALS: 'ERR_2001',
+    TOKEN_EXPIRED: 'ERR_2002',
+    INVALID_TOKEN: 'ERR_2003',
+    TOKEN_REVOKED: 'ERR_2004',
+    SESSION_EXPIRED: 'ERR_2005',
+    REFRESH_TOKEN_INVALID: 'ERR_2006',
+    REFRESH_TOKEN_EXPIRED: 'ERR_2007',
+    MFA_REQUIRED: 'ERR_2008',
+    MFA_INVALID: 'ERR_2009',
+    MISSING_TOKEN: 'ERR_2010',
+    AUTHENTICATION_FAILED: 'ERR_2011',
+    WEAK_PASSWORD: 'ERR_2012',
+    EMAIL_EXISTS: 'ERR_2013',
+    ACCOUNT_LOCKED: 'ERR_2014',
+    EMAIL_NOT_VERIFIED: 'ERR_2015',
+    TOKEN_USED: 'ERR_2016',
+    EMAIL_ALREADY_VERIFIED: 'ERR_2017',
+    INSUFFICIENT_PERMISSIONS: 'ERR_2018',
+    ACCESS_DENIED: 'ERR_2019',
+  },
+
+  // Authorization Errors (3xxx)
+  AUTHORIZATION: {
+    FORBIDDEN: 'ERR_3000',
+    INSUFFICIENT_PERMISSIONS: 'ERR_3001',
+    ROLE_NOT_FOUND: 'ERR_3002',
+    PERMISSION_DENIED: 'ERR_3003',
+    ACCESS_DENIED: 'ERR_3004',
+  },
+
+  // User Errors (4xxx)
+  USER: {
+    NOT_FOUND: 'ERR_4000',
+    ALREADY_EXISTS: 'ERR_4001',
+    DISABLED: 'ERR_4002',
+    LOCKED: 'ERR_4003',
+    PASSWORD_POLICY_VIOLATION: 'ERR_4004',
+    EMAIL_NOT_VERIFIED: 'ERR_4005',
+    INVALID_ROLE: 'ERR_4006',
+    CANNOT_DELETE_SELF: 'ERR_4007',
+  },
+
+  // Workflow Errors (5xxx)
+  WORKFLOW: {
+    NOT_FOUND: 'ERR_5000',
+    ALREADY_EXISTS: 'ERR_5001',
+    INVALID_STATE: 'ERR_5002',
+    TRANSITION_DENIED: 'ERR_5003',
+    DEFINITION_INVALID: 'ERR_5004',
+    INSTANCE_NOT_FOUND: 'ERR_5005',
+    ALREADY_RUNNING: 'ERR_5006',
+    CANNOT_CANCEL: 'ERR_5007',
+  },
+
+  // Task Errors (6xxx)
+  TASK: {
+    NOT_FOUND: 'ERR_6000',
+    ALREADY_ASSIGNED: 'ERR_6001',
+    ALREADY_COMPLETED: 'ERR_6002',
+    DEADLINE_PASSED: 'ERR_6003',
+    INVALID_STATE: 'ERR_6004',
+    CANNOT_UPDATE: 'ERR_6005',
+    INVALID_ASSIGNEE: 'ERR_6006',
+  },
+
+  // Approval Errors (7xxx)
+  APPROVAL: {
+    NOT_FOUND: 'ERR_7000',
+    ALREADY_PROCESSED: 'ERR_7001',
+    CHAIN_INCOMPLETE: 'ERR_7002',
+    DELEGATION_INVALID: 'ERR_7003',
+    NOT_APPROVER: 'ERR_7004',
+    EXPIRED: 'ERR_7005',
+  },
+
+  // Document Errors (8xxx)
+  DOCUMENT: {
+    NOT_FOUND: 'ERR_8000',
+    UPLOAD_FAILED: 'ERR_8001',
+    TYPE_NOT_ALLOWED: 'ERR_8002',
+    SIZE_EXCEEDED: 'ERR_8003',
+    CORRUPTED: 'ERR_8004',
+    DOWNLOAD_FAILED: 'ERR_8005',
+    ACCESS_DENIED: 'ERR_8006',
+  },
+
+  // Rate Limiting Errors (9xxx)
+  RATE_LIMIT: {
+    EXCEEDED: 'ERR_9000',
+    QUOTA_EXCEEDED: 'ERR_9001',
+  },
+
+  // External Service Errors (10xxx)
+  EXTERNAL: {
+    SERVICE_ERROR: 'ERR_10000',
+    SERVICE_TIMEOUT: 'ERR_10001',
+    SERVICE_UNAVAILABLE: 'ERR_10002',
+    CIRCUIT_BREAKER_OPEN: 'ERR_10003',
+  },
+} as const;
+
+// Type helpers
+export type ErrorCodeCategory = keyof typeof ERROR_CODES;
+export type ErrorCode<T extends ErrorCodeCategory> = (typeof ERROR_CODES)[T][keyof (typeof ERROR_CODES)[T]];
+export type AnyErrorCode = ErrorCode<ErrorCodeCategory>;
