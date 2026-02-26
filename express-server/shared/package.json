@@ -1,0 +1,38 @@
+{
+  "name": "@workflow/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities, types, and interfaces for Workflow Management System",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rimraf dist",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "uuid": "^9.0.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.33",
+    "@types/uuid": "^9.0.8",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "express": "^4.22.1"
+  }
+}
